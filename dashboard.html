@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাডমিন ড্যাশবোর্ড - Daily Pick</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 pb-12">
+
+    <!-- ১. লগইন না থাকলে পাসওয়ার্ড সিকিউরিটি স্ক্রিন -->
+    <div id="loginOverlay" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xs w-full p-6 text-center shadow-2xl border">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-900">অ্যাডমিন প্রবেশ</h3>
+            <p class="text-xs text-gray-500 mt-1 mb-4">ড্যাশবোর্ড দেখতে আপনার ৪ ডিজিটের গোপন পিন দিন</p>
+            <form onsubmit="verifyPagePin(event)" class="space-y-3">
+                <input type="password" id="pageAdminPin" maxlength="6" required placeholder="• • • •" class="w-full text-center text-xl tracking-widest font-black border-2 border-indigo-200 p-2.5 rounded-xl outline-none focus:border-indigo-600 bg-gray-50">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
+                    প্রবেশ করুন 🔓
+                </button>
+            </form>
+            <a href="index.html" class="inline-block mt-3 text-xs text-gray-400 hover:text-indigo-600">← মূল ওয়েবসাইটে ফিরে যান</a>
+        </div>
+    </div>
+
+    <!-- ২. মূল ড্যাশবোর্ড পেজ কনটেন্ট -->
+    <div id="dashboardContent" class="hidden">
+        
+        <!-- টপ নেভিগেশন বার -->
+        <header class="bg-white border-b sticky top-0 z-30 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shadow">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </span>
+                    <div>
+                        <h1 class="text-base font-black text-gray-900 leading-tight">Daily Pick অ্যাডমিন প্যানেল</h1>
+                        <p class="text-[10px] text-green-600 font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></span> লাইভ ড্যাশবোর্ড
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 border border-indigo-200">
+                        <i class="fa-solid fa-store"></i> <span class="hidden sm:inline">শপ দেখুন</span>
+                    </a>
+                    <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 border border-red-200">
+                        <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ড্যাশবোর্ড বডি -->
+        <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
+
+            <!-- ৬টি মূল অ্যানালিটিক্স মেট্রিক কার্ড -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="bg-white p-3.5 rounded-2xl border shadow-sm flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase block">মোট ভিজিটর</span>
+                        <h4 id="statVisitors" class="text-base font-black text-gray-800">০</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border shadow-sm flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase block">মোট অর্ডার</span>
+                        <h4 id="statTotalOrders" class="text-base font-black text-indigo-600">০</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-yellow-200 shadow-sm flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-base"><i class="fa-solid fa-clock"></i></div>
+                    <div>
+                        <span class="text-[9px] text-yellow-700 font-bold uppercase block">পেন্ডিং</span>
+                        <h4 id="statPendingOrders" class="text-base font-black text-yellow-600">০</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-blue-200 shadow-sm flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <div>
+                        <span class="text-[9px] text-blue-700 font-bold uppercase block">কনফার্মড</span>
+                        <h4 id="statConfirmedOrders" class="text-base font-black text-blue-600">০</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-green-200 shadow-sm flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-base"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <span class="text-[9px] text-green-700 font-bold uppercase block">ডেলিভার্ড</span>
+                        <h4 id="statDeliveredOrders" class="text-base font-black text-green-600">০</h4>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-indigo-900 to-gray-900 text-white p-3.5 rounded-2xl shadow-md flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-400 text-gray-950 flex items-center justify-center text-base font-black">৳</div>
+                    <div>
+                        <span class="text-[9px] text-gray-300 font-bold uppercase block">মোট বিক্রি (আয়)</span>
+                        <h4 id="statTotalRevenue" class="text-base font-black text-yellow-400">৳ ০</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ফিল্টার ও সার্চ বার -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 rounded-2xl border shadow-sm">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs font-bold text-gray-700">অর্ডার ফিল্টার:</span>
+                    <button onclick="filterOrders('all')" id="flt-all" class="flt-btn bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl">সবগুলো</button>
+                    <button onclick="filterOrders('pending')" id="flt-pending" class="flt-btn bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-xl">পেন্ডিং</button>
+                    <button onclick="filterOrders('confirmed')" id="flt-confirmed" class="flt-btn bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-xl">কনফার্মড</button>
+                    <button onclick="filterOrders('delivered')" id="flt-delivered" class="flt-btn bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-xl">ডেলিভার্ড</button>
+                </div>
+                <span id="orderTotalCount" class="text-xs bg-gray-100 text-gray-600 font-bold px-3 py-1.5 rounded-xl">০ টি অর্ডার</span>
+            </div>
+
+            <!-- অর্ডার কার্ডের গ্রিড/তালিকা -->
+            <div id="ordersContainer" class="space-y-4">
+                <!-- জাভাস্ক্রিপ্ট দ্বারা ছবিসহ অর্ডার কার্ড লোড হবে -->
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Dashboard Script -->
+    <script>
+        const SECRET_PIN = "0132";
+        let currentFilter = 'all';
+
+        // পিন চেক করে ড্যাশবোর্ড দেখানো
+        function checkAuth() {
+            const isAuth = sessionStorage.getItem('dailyPickAdminLoggedIn') === 'true';
+            if (isAuth) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('dashboardContent').classList.remove('hidden');
+                refreshDashboard();
+            } else {
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('dashboardContent').classList.add('hidden');
+            }
+        }
+
+        function verifyPagePin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pageAdminPin').value.trim();
+            if (pin === SECRET_PIN) {
+                sessionStorage.setItem('dailyPickAdminLoggedIn', 'true');
+                checkAuth();
+            } else {
+                alert("ভুল পিন কোড! শুধুমাত্র অ্যাডমিন প্রবেশ করতে পারবেন। ❌");
+                document.getElementById('pageAdminPin').value = "";
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('dailyPickAdminLoggedIn');
+            window.location.href = "index.html";
+        }
+
+        function filterOrders(status) {
+            currentFilter = status;
+            document.querySelectorAll('.flt-btn').forEach(btn => {
+                btn.className = "flt-btn bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-xl";
+            });
+            document.getElementById(`flt-${status}`).className = "flt-btn bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl";
+            refreshDashboard();
+        }
+
+        // ড্যাশবোর্ড মেট্রিক ও অর্ডার রেন্ডার
+        function refreshDashboard() {
+            const visitors = localStorage.getItem('dailyPickVisitorCount') || "০";
+            const orders = JSON.parse(localStorage.getItem('dailyPickOrdersList')) || [];
+
+            let pending = 0, confirmed = 0, delivered = 0, revenue = 0;
+            orders.forEach(o => {
+                if (o.status === 'pending') pending++;
+                if (o.status === 'confirmed') confirmed++;
+                if (o.status === 'delivered') {
+                    delivered++;
+                    revenue += o.productPrice;
+                }
+            });
+
+            document.getElementById('statVisitors').innerText = visitors;
+            document.getElementById('statTotalOrders').innerText = orders.length;
+            document.getElementById('statPendingOrders').innerText = pending;
+            document.getElementById('statConfirmedOrders').innerText = confirmed;
+            document.getElementById('statDeliveredOrders').innerText = delivered;
+            document.getElementById('statTotalRevenue').innerText = "৳ " + revenue.toLocaleString('bn-BD');
+
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = "";
+
+            const filteredOrders = currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter);
+            document.getElementById('orderTotalCount').innerText = `${filteredOrders.length} টি অর্ডার`;
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-12 text-center border text-gray-400">
+                        <i class="fa-solid fa-box-open text-5xl mb-3 text-gray-300"></i>
+                        <h4 class="text-sm font-bold text-gray-700">কোনো অর্ডার পাওয়া যায়নি</h4>
+                        <p class="text-xs text-gray-400 mt-1">নতুন অর্ডার আসলে স্বয়ংক্রিয়ভাবে এখানে তালিকা তৈরি হবে।</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredOrders.forEach((o, index) => {
+                let statusBadge = "";
+                if (o.status === 'pending') statusBadge = `<span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-yellow-200">⏳ পেন্ডিং</span>`;
+                if (o.status === 'confirmed') statusBadge = `<span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-blue-200">✅ কনফার্মড</span>`;
+                if (o.status === 'delivered') statusBadge = `<span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-green-200">🎉 সফল বিক্রি (ডেলিভার্ড)</span>`;
+
+                const areaTag = o.deliveryFee === 80 ? "ঢাকার ভেতরে (১-২ দিন)" : "ঢাকার বাইরে (৩ দিন)";
+                
+                // পণ্যের ছবি
+                const imgHtml = o.productImg ? 
+                    `<img src="${o.productImg}" alt="${o.productTitle}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl border border-gray-200 shadow-sm flex-shrink-0">` : 
+                    `<div class="w-16 h-16 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-500 text-xl flex-shrink-0"><i class="fa-solid fa-image"></i></div>`;
+
+                container.innerHTML += `
+                    <div class="bg-white border-2 border-gray-200 rounded-3xl p-4 md:p-5 shadow-sm space-y-4 hover:border-indigo-300 transition">
+                        
+                        <!-- টপ বার -->
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-indigo-700 text-sm font-mono tracking-wide">${o.orderId}</span>
+                                <span class="text-gray-400 text-xs">• ${o.date}</span>
+                            </div>
+                            <div>${statusBadge}</div>
+                        </div>
+
+                        <!-- ৪টি পরিষ্কার তথ্য বক্স -->
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs">
+                            
+                            <!-- ১. পণ্য ও ছবি -->
+                            <div class="md:col-span-4 flex items-center gap-3 bg-gray-50 p-3 rounded-2xl border">
+                                ${imgHtml}
+                                <div class="min-w-0">
+                                    <h5 class="font-bold text-gray-900 truncate text-xs md:text-sm">${o.productTitle}</h5>
+                                    <span class="inline-block bg-indigo-100 text-indigo-800 font-bold text-[10px] px-2 py-0.5 rounded mt-0.5">সাইজ/কালার: ${o.productVariant || 'সাধারণ'}</span>
+                                    <p class="text-indigo-700 font-black text-sm mt-1">৳ ${o.productPrice}</p>
+                                </div>
+                            </div>
+
+                            <!-- ২. কাস্টমার তথ্য -->
+                            <div class="md:col-span-4 bg-gray-50 p-3 rounded-2xl border space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-gray-900 text-xs md:text-sm">${o.customerName}</span>
+                                    <a href="tel:${o.phone}" class="bg-green-100 hover:bg-green-200 text-green-700 text-[10px] font-bold px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-phone text-[9px]"></i> কল দিন
+                                    </a>
+                                </div>
+                                <p class="text-indigo-700 font-semibold font-mono">${o.phone}</p>
+                                <p class="text-gray-600 text-[11px] leading-tight">📍 ${o.address}</p>
+                                <span class="inline-block text-[10px] text-gray-500 font-bold bg-white px-2 py-0.5 rounded border border-gray-200 mt-1">${areaTag}</span>
+                            </div>
+
+                            <!-- ৩. পেমেন্ট ও TrxID -->
+                            <div class="md:col-span-4 bg-gray-50 p-3 rounded-2xl border space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">পেমেন্ট মেথড:</span>
+                                    <span class="font-bold text-indigo-700 uppercase">${o.payMethod}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">প্রেরক নম্বর:</span>
+                                    <span class="font-mono text-gray-800 font-bold">${o.senderPhone}</span>
+                                </div>
+                                <div class="flex items-center justify-between bg-white p-1.5 rounded-xl border">
+                                    <span class="text-gray-400 text-[10px]">TrxID:</span>
+                                    <span class="font-mono text-indigo-700 font-black text-xs">${o.trxId}</span>
+                                </div>
+                                <div class="flex justify-between pt-1">
+                                    <span class="text-green-600 font-bold">অগ্রিম পেইড: ৳${o.deliveryFee}</span>
+                                    <span class="text-gray-900 font-black">বাকি প্রাপ্য: ৳${o.productPrice}</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- অ্যাকশন বাটনসমূহ -->
+                        <div class="flex flex-wrap items-center justify-end gap-2 border-t pt-3">
+                            <button onclick="confirmOrderWithNotice(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-check"></i> কনফার্ম করুন
+                            </button>
+                            <button onclick="sendCustomerDeliveryNotice(${index})" class="bg-green-600 hover:bg-green-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-1.5 transition">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp নোটিস
+                            </button>
+                            <button onclick="updateOrderStatus(${index}, 'delivered')" class="bg-gray-800 hover:bg-black text-white px-3 py-2 rounded-xl text-xs font-bold shadow transition">
+                                ডেলিভার্ড চিহ্নিত করুন
+                            </button>
+                            <button onclick="deleteSingleOrder(${index})" title="অর্ডার ডিলিট করুন" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl text-xs border border-red-200">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        // WhatsApp নোটিস
+        function sendCustomerDeliveryNotice(orderIndex) {
+            let orders = JSON.parse(localStorage.getItem('dailyPickOrdersList')) || [];
+            let o = orders[orderIndex];
+            if (!o) return;
+
+            let cleanPhone = o.phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
+            else if (!cleanPhone.startsWith('880')) cleanPhone = '880' + cleanPhone;
+
+            let deliveryTimelineText = o.deliveryFee === 80 ? 
+                "📍 আপনার এলাকা ঢাকার ভেতরে হওয়ায় আগামী ১ থেকে ২ দিনের মধ্যে পার্সেলটি আপনার ঠিকানায় পৌঁছে যাবে ইনশাআল্লাহ।" : 
+                "📍 আপনার এলাকা ঢাকার বাইরে হওয়ায় আগামী ৩ দিনের মধ্যে পার্সেলটি আপনার ঠিকানায় পৌঁছে যাবে ইনশাআল্লাহ।";
+
+            const message = 
+`আসসালামু আলাইকুম ${o.customerName},
+Daily Pick-এ আপনার অর্ডারটি সফলভাবে কনফার্ম করা হয়েছে! 🎉
+----------------------------------
+📦 *অর্ডার আইডি:* ${o.orderId}
+🛍️ *পণ্য:* ${o.productTitle} (${o.productVariant || 'সাধারণ'})
+💳 *অগ্রিম ডেলিভারি চার্জ:* ৳${o.deliveryFee} (পরিশোধিত ✓)
+💵 *ক্যাশ অন ডেলিভারিতে বাকি প্রাপ্য:* ৳${o.productPrice}
+
+🚚 *ডেলিভারি সময়সীমা:*
+${deliveryTimelineText}
+
+কুরিয়ার প্রতিনিধি ডেলিভারির সময় আপনাকে ফোন করবে। যেকোনো প্রয়োজনে আমাদের জানাতে পারেন।
+ধন্যবাদান্তে,
+*Daily Pick শপ* 🛍️`;
+
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function confirmOrderWithNotice(orderIndex) {
+            let orders = JSON.parse(localStorage.getItem('dailyPickOrdersList')) || [];
+            if (orders[orderIndex]) {
+                orders[orderIndex].status = 'confirmed';
+                localStorage.setItem('dailyPickOrdersList', JSON.stringify(orders));
+                refreshDashboard();
+
+                if (confirm("অর্ডারটি সফলভাবে কনফার্ম হয়েছে! ✅\nআপনি কি এখনই কাস্টমারকে WhatsApp-এ ডেলিভারি সময়সীমার মেসেজ পাঠাতে চান?")) {
+                    sendCustomerDeliveryNotice(orderIndex);
+                }
+            }
+        }
+
+        function updateOrderStatus(orderIndex, newStatus) {
+            let orders = JSON.parse(localStorage.getItem('dailyPickOrdersList')) || [];
+            if (orders[orderIndex]) {
+                orders[orderIndex].status = newStatus;
+                localStorage.setItem('dailyPickOrdersList', JSON.stringify(orders));
+                refreshDashboard();
+                alert("অর্ডারের স্ট্যাটাস আপডেট হয়েছে! ✅");
+            }
+        }
+
+        function deleteSingleOrder(orderIndex) {
+            if (confirm("আপনি কি নিশ্চিত এই অর্ডারটি মুছে ফেলতে চান?")) {
+                let orders = JSON.parse(localStorage.getItem('dailyPickOrdersList')) || [];
+                orders.splice(orderIndex, 1);
+                localStorage.setItem('dailyPickOrdersList', JSON.stringify(orders));
+                refreshDashboard();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>

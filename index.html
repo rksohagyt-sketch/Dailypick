@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Pick - পোশাক ও গ্যাজেট শপ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Announcement Bar -->
+    <div class="announcement-bar text-white text-xs md:text-sm py-2 px-4 text-center font-medium">
+        ⚡ অর্ডার কনফার্ম করতে ডেলিভারি চার্জ অগ্রিম প্রযোজ্য | সারা দেশে দ্রুত হোম ডেলিভারি!
+    </div>
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-black text-indigo-700 tracking-tight flex items-center gap-1">
+                <span>Daily</span><span class="text-red-500">Pick</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <button onclick="openAdminModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg border border-indigo-200 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-plus-circle text-indigo-600"></i> প্রোডাক্ট অ্যাড করুন
+                </button>
+                <a href="https://wa.me/8801321636400" target="_blank" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> হেল্পলাইন
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dynamic Hero / Today's Daily Pick Section -->
+    <section id="heroSection" class="max-w-6xl mx-auto px-4 py-6">
+        <!-- Rendered dynamically by script.js -->
+    </section>
+
+    <!-- Category Filter -->
+    <section class="max-w-6xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between border-b pb-3 mb-6">
+            <h2 class="text-xl font-bold text-gray-800">আমাদের পণ্যসমূহ</h2>
+            <div class="flex gap-2 text-sm">
+                <button onclick="filterCategory('all')" id="btn-all" class="cat-btn active">সবগুলো</button>
+                <button onclick="filterCategory('পোশাক')" id="btn-পোশাক" class="cat-btn">পোশাক</button>
+                <button onclick="filterCategory('গ্যাজেট')" id="btn-গ্যাজেট" class="cat-btn">গ্যাজেট</button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Products will be loaded via script.js -->
+        </div>
+    </section>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 my-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">অর্ডার কনফার্মেশন</h3>
+                <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- Product Summary -->
+            <div class="bg-indigo-50 p-3 rounded-xl mt-3 flex items-center gap-3">
+                <img id="modalProductImg" src="" class="w-16 h-16 object-cover rounded-lg border">
+                <div>
+                    <h4 id="modalProductTitle" class="font-bold text-sm text-gray-900 leading-tight"></h4>
+                    <p class="text-xs text-indigo-700 font-semibold mt-1">মূল্য: ৳ <span id="modalProductPrice"></span></p>
+                </div>
+            </div>
+
+            <form id="orderForm" onsubmit="handleOrderSubmit(event)" class="space-y-4 mt-4">
+                <!-- Size / Variant Selector -->
+                <div id="variantSection" class="hidden">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">সাইজ / কালার নির্বাচন করুন:</label>
+                    <div id="variantOptions" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Customer Details -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">আপনার নাম *</label>
+                    <input type="text" id="custName" required placeholder="পুরো নাম লিখুন" class="w-full text-sm border p-2.5 rounded-lg outline-none focus:border-indigo-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">মোবাইল নম্বর *</label>
+                    <input type="tel" id="custPhone" required placeholder="০১xxxxxxxxx" class="w-full text-sm border p-2.5 rounded-lg outline-none focus:border-indigo-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">পূর্ণাঙ্গ ঠিকানা *</label>
+                    <textarea id="custAddress" required rows="2" placeholder="বাড়ি নং, রোড, থানা, জেলা" class="w-full text-sm border p-2.5 rounded-lg outline-none focus:border-indigo-600"></textarea>
+                </div>
+
+                <!-- Delivery Area -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ডেলিভারি এরিয়া নির্বাচন করুন *</label>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <label class="border p-2.5 rounded-lg flex items-center gap-2 cursor-pointer has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                            <input type="radio" name="deliveryArea" value="80" checked onchange="updateSummary()" class="text-indigo-600">
+                            <span>ঢাকার ভেতরে (৳ ৮০)</span>
+                        </label>
+                        <label class="border p-2.5 rounded-lg flex items-center gap-2 cursor-pointer has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                            <input type="radio" name="deliveryArea" value="130" onchange="updateSummary()" class="text-indigo-600">
+                            <span>ঢাকার বাইরে (৳ ১৩০)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Instructions -->
+                <div class="bg-red-50 border border-red-200 p-3 rounded-xl space-y-2">
+                    <p class="text-xs font-bold text-red-700 flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i> ডেলিভারি চার্জ অগ্রিম প্রযোজ্য
+                    </p>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        অর্ডার নিশ্চিত করতে ডেলিভারি চার্জ 
+                        <b class="text-red-600 font-bold">৳ <span id="advDeliveryFee">৮০</span></b> 
+                        আমাদের বিকাশ বা নগদ নম্বরে সেন্ড মানি করুন। বাকি টাকা ক্যাশ অন ডেলিভারিতে পরিশোধ করবেন।
+                    </p>
+                    
+                    <div class="bg-white p-2.5 rounded-lg border flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">বিকাশ / নগদ (Personal):</span>
+                            <span class="font-bold text-sm tracking-wider text-indigo-700 font-mono">01323615713</span>
+                        </div>
+                        <button type="button" onclick="copyNumber('01323615713')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs px-2.5 py-1.5 rounded-md font-semibold">
+                            কপি করুন 📋
+                        </button>
+                    </div>
+
+                    <!-- Payment Inputs -->
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-1">পেমেন্ট মেথড</label>
+                            <select id="payMethod" class="w-full text-xs border p-2 rounded-lg bg-white">
+                                <option value="bKash">বিকাশ (bKash)</option>
+                                <option value="Nagad">নগদ (Nagad)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-1">যে নম্বর থেকে পাঠিয়েছেন *</label>
+                            <input type="text" id="senderNum" required placeholder="আপনার নম্বর" class="w-full text-xs border p-2 rounded-lg outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">Transaction ID (TrxID) *</label>
+                        <input type="text" id="trxId" required placeholder="যেমন: 9J8K7L6M" class="w-full text-xs border p-2 rounded-lg uppercase outline-none">
+                    </div>
+                </div>
+
+                <!-- Order Final Summary -->
+                <div class="text-xs border-t pt-2 space-y-1 text-gray-600">
+                    <div class="flex justify-between">
+                        <span>পণ্যের দাম:</span>
+                        <span>৳ <span id="summaryProductPrice">0</span></span>
+                    </div>
+                    <div class="flex justify-between text-red-600 font-medium">
+                        <span>অগ্রিম পরিশোধিত (ডেলিভারি):</span>
+                        <span>৳ <span id="summaryAdvance">৮০</span></span>
+                    </div>
+                    <div class="flex justify-between font-bold text-sm text-gray-900 border-t pt-1">
+                        <span>ক্যাশ অন ডেলিভারিতে প্রদেয়:</span>
+                        <span>৳ <span id="summaryDue">0</span></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> অর্ডার নিশ্চিত করুন (WhatsApp)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Modal: Add New Product (with Gallery Upload) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-base font-bold text-gray-800">নতুন প্রোডাক্ট যোগ করুন</h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            
+            <form onsubmit="handleProductAdd(event)" class="space-y-3 mt-3">
+                <!-- Gallery Image Upload Input -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">গ্যালারি থেকে পণ্যের ছবি নির্বাচন করুন *</label>
+                    <input type="file" id="adminImgFile" accept="image/*" required onchange="previewSelectedImage(this)" class="w-full text-xs border p-2 rounded-lg file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <!-- Image Preview -->
+                    <div id="imagePreviewContainer" class="mt-2 hidden flex items-center gap-2">
+                        <img id="imagePreview" src="" class="w-16 h-16 object-cover rounded-lg border">
+                        <span class="text-xs text-green-600 font-semibold">✓ ছবি সিলেক্ট হয়েছে</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">প্রোডাক্টের নাম *</label>
+                    <input type="text" id="adminTitle" required placeholder="যেমন: প্রিমিয়াম ড্রপ-শোল্ডার টি-শার্ট" class="w-full text-xs border p-2 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ক্যাটাগরি *</label>
+                    <select id="adminCategory" class="w-full text-xs border p-2 rounded-lg bg-white">
+                        <option value="পোশাক">পোশাক (Fashion)</option>
+                        <option value="গ্যাজেট">গ্যাজেট (Gadget)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">বিক্রয় মূল্য (৳) *</label>
+                        <input type="number" id="adminPrice" required placeholder="৮৫০" class="w-full text-xs border p-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">আগের মূল্য (৳)</label>
+                        <input type="number" id="adminOldPrice" placeholder="১২০০" class="w-full text-xs border p-2 rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">সাইজ বা কালার অপশন (কমা দিয়ে লিখুন)</label>
+                    <input type="text" id="adminVariants" placeholder="M, L, XL, XXL অথবা Black, Silver" class="w-full text-xs border p-2 rounded-lg">
+                </div>
+
+                <!-- Daily Pick Checkbox -->
+                <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 p-2.5 rounded-lg">
+                    <input type="checkbox" id="adminIsDailyPick" class="w-4 h-4 text-indigo-600 rounded">
+                    <label for="adminIsDailyPick" class="text-xs font-bold text-gray-800 cursor-pointer">
+                        🔥 এটিকে আজকের সেরা ডিল (Daily Pick) হিসেবে ব্যানার করুন
+                    </label>
+                </div>
+
+                <button type="submit" id="adminSaveBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow">
+                    প্রোডাক্ট সেভ করুন 💾
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 text-xs py-8 mt-12 border-t">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+            <p class="text-white font-bold text-base">Daily Pick - বিশ্বস্ত অনলাইন শপ</p>
+            <p>WhatsApp: 01321636400 | বিকাশ/নগদ: 01323615713</p>
+            <p>© ২০২৬ Daily Pick. সর্বস্বত্ব সংরক্ষিত।</p>
+        </div>
+    </footer>
+
+    <!-- Custom JS File -->
+    <script src="script.js"></script>
+<script src="custom.js"></script>
+<script src="feature.js"></script>
+<script src="reviews.js"></script>
+<script src="timer.js"></script>
+<script src="admin.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
